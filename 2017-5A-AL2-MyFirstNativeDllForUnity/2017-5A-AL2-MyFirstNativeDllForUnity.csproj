@@ -46,6 +46,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ALGLib\alglibinternal.cs" />
+    <Compile Include="ALGLib\alglibmisc.cs" />
+    <Compile Include="ALGLib\alglib_info.cs" />
+    <Compile Include="ALGLib\ap.cs" />
+    <Compile Include="ALGLib\dataanalysis.cs" />
+    <Compile Include="ALGLib\diffequations.cs" />
+    <Compile Include="ALGLib\fasttransforms.cs" />
+    <Compile Include="ALGLib\integration.cs" />
+    <Compile Include="ALGLib\interpolation.cs" />
+    <Compile Include="ALGLib\linalg.cs" />
+    <Compile Include="ALGLib\optimization.cs" />
+    <Compile Include="ALGLib\solvers.cs" />
+    <Compile Include="ALGLib\specialfunctions.cs" />
+    <Compile Include="ALGLib\statistics.cs" />
     <Compile Include="Source.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
