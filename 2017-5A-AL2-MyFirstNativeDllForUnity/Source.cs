@@ -28,8 +28,18 @@ namespace MyDll
             alglib.matinvreport mr;
 
             double[,] Y = ToRectangular(outputs, 1);
-            double[,] Xt = Transpose(inputs);
-            double[,] XtX = MultiplyMatrix(Xt, inputs);
+            double[,] X = new double[inputs.GetLength(0), inputs.GetLength(1) + 1];
+            for (int j = 0; j < inputs.GetLength(0); j++)
+            {
+                X[j, 0] = 1;
+                for (int k = 0; k < inputs.GetLength(1); k++)
+                {
+                    X[j, k + 1] = inputs[j, k];
+                }
+            }
+
+            double[,] Xt = Transpose(X);
+            double[,] XtX = MultiplyMatrix(Xt, X);
             rmatrixinverse(ref XtX , out i, out mr);
             double[,] XtXXt = MultiplyMatrix(XtX, Xt);
             double[,] result = MultiplyMatrix(XtXXt, Y);
@@ -42,11 +52,17 @@ namespace MyDll
 
         public static int linear_fit_classification_rosenblatt(ref double[] model, double[] inputs, double[] outputs, int iterationNumber, double step)
         {
+            double[] inputs2 = new double[inputs.Length+1];
+            inputs2[0] = 1;
+            for (int i = 0; i < inputs.Length; i++)
+            {
+                inputs2[i + 1] = inputs[i];
+            }
 
-			double[,] Y = ToRectangular(outputs, 1);
-			double[,] X = ToRectangular(inputs, 1);
+            double[,] Y = ToRectangular(outputs, 1);
+			double[,] X = ToRectangular(inputs2, 1);
 
-			for (int i = 0; i < iterationNumber; i++)
+            for (int i = 0; i < iterationNumber; i++)
 			{
 				double linearClassifyRes = linear_classify(ref model, inputs);
 
@@ -56,8 +72,8 @@ namespace MyDll
 				double[,] subRes = SubstractMatrix(Y, sub);
 				double[,] multiplyRes = MultiplyMatrix(X, subRes);
 				double[,] rectModel = ToRectangular(model, 1);
-
-				rectModel = AdditionMatrix(rectModel, MultiplyMatrixScalar(step, multiplyRes));
+                
+                rectModel = AdditionMatrix(rectModel, MultiplyMatrixScalar(step, multiplyRes));
 				ToLinear(ref model, rectModel);
 
 			}
@@ -67,7 +83,6 @@ namespace MyDll
 
         public static double linear_classify(ref double[] model, double[] input)
         {
-            int modelsize = model.Length;
 			int inputSize = input.Length;
 
 			double result = 1 * model[0];
@@ -81,7 +96,6 @@ namespace MyDll
 
         public static double linear_predict(ref double[] model, double[] input)
         {
-            int modelsize = model.Length;
             int inputSize = input.Length;
 
             double result = 1 * model[0];
@@ -133,6 +147,7 @@ namespace MyDll
             }
 
             return lineSize;
+
         }
 
         public static double[,] MultiplyMatrix(double[,] A, double[,] B)
@@ -170,11 +185,11 @@ namespace MyDll
             int rB = B.GetLength(0);
             int cB = B.GetLength(1);
             double[,] result = new double[rB,cB];
-            for (int i = 0; i < cB; i++)
+            for (int i = 0; i < rB; i++)
             {
-                for (int j = 0; j < rB; j++)
+                for (int j = 0; j < cB; j++)
                 {
-                    result[i, j] = A * result[i, j];
+                    result[i, j] = A * B[i, j];
                 }
             }
             return result;
@@ -187,7 +202,7 @@ namespace MyDll
             int rB = B.GetLength(0);
             int cB = B.GetLength(1);
             double[,] result = new double[rA, cA];
-            if (cA != rA || cB != rB)
+            if (cA != cB || rA != rB)
             {
                 Console.WriteLine("matrix cannot be added !!!");
                 result = null;
@@ -212,10 +227,10 @@ namespace MyDll
 			int rB = B.GetLength(0);
 			int cB = B.GetLength(1);
 			double[,] result = new double[rA, cA];
-			if (cA != rA || cB != rB)
+			if (cA != cB || rA != rB)
 			{
 				Console.WriteLine("matrix cannot be added !!!");
-				result = null;
+                result = null;
 			}
 			else
 			{
