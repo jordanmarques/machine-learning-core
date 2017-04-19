@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using UnityEngine;
 using static alglib;
 using Random = System.Random;
 
@@ -17,7 +16,7 @@ namespace MyDll
             for (int i = 0; i < inputDimension; i++)
             {
                 Random random = new Random();
-                model[i] = random.NextDouble();
+                model[i] = random.NextDouble() * 2 - 1;
             }
 
             return model;
@@ -46,15 +45,30 @@ namespace MyDll
             return 0;
         }
 
-        public static int linear_fit_classification_rosenblatt(ref double[] model, double[,] inputs,
-            double[] outputs, int iterationNumber, double step)
+        public static int linear_fit_classification_rosenblatt(ref double[] model, double[] inputs, double[] outputs, int iterationNumber, double step)
         {
+
+			double[,] Y = ToRectangular(outputs, 1);
+			double linearClassifyRes = linear_classify(ref model, inputs);
+			double[,] X = ToRectangular(inputs, 1);
+
+
+
             return 0;
         }
 
         public static double linear_classify(ref double[] model, double[] input)
         {
-            return 0;
+            int modelsize = model.Length;
+			int inputSize = input.Length;
+
+			double result = 1 * model[0];
+
+			for (int i = 0; i < inputSize; i++)
+			{
+				result += model[i + 1] * input[i];
+			}
+			return Math.Tanh(result);
         }
 
         public static double linear_predict(ref double[] model, double[] input)
@@ -182,6 +196,31 @@ namespace MyDll
             }
             return result;
         }
+
+		public static double[,] SubstractMatrix(double[,] A, double[,] B)
+		{
+			int rA = A.GetLength(0);
+			int cA = A.GetLength(1);
+			int rB = B.GetLength(0);
+			int cB = B.GetLength(1);
+			double[,] result = new double[rA, cA];
+			if (cA != rA || cB != rB)
+			{
+				Console.WriteLine("matrix cannot be added !!!");
+				result = null;
+			}
+			else
+			{
+				for (int i = 0; i < rA; i++)
+				{
+					for (int j = 0; j < cA; j++)
+					{
+						result[i, j] = A[i, j] - B[i, j];
+					}
+				}
+			}
+			return result;
+		}
 
     }
 }

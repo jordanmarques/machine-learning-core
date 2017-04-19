@@ -291,4 +291,6 @@ __pycache__/
 *.odx.cs
 *.xsd.cs
 
-# End of https://www.gitignore.io/api/csharp
+# MAC
+
+.DS_Store
