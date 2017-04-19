@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using UnityEngine;
 using static alglib;
+using Random = System.Random;
 
 namespace MyDll
 {
     public static class Source
     {
-        public static IntPtr linear_create_model(int inputDimension)
+        public static double[] linear_create_model(int inputDimension)
         {
             double[] model = new double[inputDimension];
             for (int i = 0; i < inputDimension; i++)
@@ -18,30 +20,55 @@ namespace MyDll
                 model[i] = random.NextDouble();
             }
 
-            IntPtr intPtr = Marshal.AllocHGlobal(Marshal.SizeOf(model));
-            Marshal.StructureToPtr(model, intPtr, false);
-
-            return intPtr;
+            return model;
         }
 
-        public static void linear_remove_model(IntPtr model)
-        {
-            Marshal.FreeHGlobal(model);
-        }
-
-
-        public static int linear_fit_regression(IntPtr model, double[] inputs, int inputSize, double[] outputs)
+        public static int linear_fit_regression(ref double[] model, double[,] inputs, double[] outputs)
         {
             int i;
             alglib.matinvreport mr;
 
             double[,] Y = ToRectangular(outputs, 1);
-            double[,] X = ToRectangular(inputs, inputSize);
-            double[,] Xt = Transpose(X);
-
-            rmatrixinverse(ref X , out i, out mr);
+            double[,] Xt = Transpose(inputs);
+            double[,] XtX = MultiplyMatrix(Xt, inputs);
+            rmatrixinverse(ref XtX , out i, out mr);
+            double[,] XtXXt = MultiplyMatrix(XtX, Xt);
+            double[,] result = MultiplyMatrix(XtXXt, Y);
+            double[] linearResult = new double[0];
+            ToLinear(ref linearResult, result);
+            model = linearResult;
 
             return 0;
+        }
+
+        public static int linear_fit_classification_hebb(ref double[] model, double[,] inputs, int iterationNumber, double step)
+        {
+            return 0;
+        }
+
+        public static int linear_fit_classification_rosenblatt(ref double[] model, double[,] inputs,
+            double[] outputs, int iterationNumber, double step)
+        {
+            return 0;
+        }
+
+        public static double linear_classify(ref double[] model, double[] input)
+        {
+            return 0;
+        }
+
+        public static double linear_predict(ref double[] model, double[] input)
+        {
+            int modelsize = model.Length;
+            int inputSize = input.Length;
+
+            double result = 1 * model[0];
+
+            for (int i = 0; i < inputSize; i++)
+            {
+                result += model[i + 1] * input[i];
+            }
+            return result;
         }
 
         public static double[,] Transpose(double[,] matrix)
@@ -59,21 +86,6 @@ namespace MyDll
             } return result;
         }
 
-        public static double[,] MatricialProduct(double[,] matrix1, double[,] matrix2)
-        {
-            double[,] result = new double[matrix1.GetLength(0), matrix2.GetLength(1)];
-            for (int i = 0; i < result.GetLength(0); i++)
-            {
-                for (int j = 0; j < result.GetLength(1); j++)
-                {
-                    //result[i, j] = ma
-                }
-            }
-
-            return result;
-        }
-
-
         public static double[,] ToRectangular(double[] flatArray, int width)
         {
             int height = (int)Math.Ceiling(flatArray.Length / (double)width);
@@ -87,6 +99,90 @@ namespace MyDll
 
             return result;
         }
+
+        public static int ToLinear(ref double[] result, double[,] rectangularArray)
+        {
+            int lineSize = rectangularArray.GetLength(1);
+            result = new double[rectangularArray.GetLength(0) * lineSize];
+
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = rectangularArray[i / lineSize, i % lineSize];
+            }
+
+            return lineSize;
+        }
+
+        public static double[,] MultiplyMatrix(double[,] A, double[,] B)
+        {
+            int rA = A.GetLength(0);
+            int cA = A.GetLength(1);
+            int rB = B.GetLength(0);
+            int cB = B.GetLength(1);
+            double[,] result = new double[rA, cB];
+            if (cA != rB)
+            {
+                Console.WriteLine("matrix cannot be multiplied !!!");
+                result = null;
+            }
+            else
+            {
+                for (int i = 0; i < rA; i++)
+                {
+                    for (int j = 0; j < cB; j++)
+                    {
+                        double temp = 0;
+                        for (int k = 0; k < cA; k++)
+                        {
+                            temp += A[i, k] * B[k, j];
+                        }
+                        result[i, j] = temp;
+                    }
+                }
+            }
+            return result;
+        }
+
+        public static double[,] MultiplyMatrixScalar(double A, double[,] B)
+        {
+            int rB = B.GetLength(0);
+            int cB = B.GetLength(1);
+            double[,] result = new double[rB,cB];
+            for (int i = 0; i < cB; i++)
+            {
+                for (int j = 0; j < rB; j++)
+                {
+                    result[i, j] = A * result[i, j];
+                }
+            }
+            return result;
+        }
+
+        public static double[,] AdditionMatrix(double[,] A, double[,] B)
+        {
+            int rA = A.GetLength(0);
+            int cA = A.GetLength(1);
+            int rB = B.GetLength(0);
+            int cB = B.GetLength(1);
+            double[,] result = new double[rA, cA];
+            if (cA != rA || cB != rB)
+            {
+                Console.WriteLine("matrix cannot be added !!!");
+                result = null;
+            }
+            else
+            {
+                for (int i = 0; i < rA; i++)
+                {
+                    for (int j = 0; j < cA; j++)
+                    {
+                        result[i, j] = A[i, j] + B[i, j];
+                    }
+                }
+            }
+            return result;
+        }
+
     }
 }
 

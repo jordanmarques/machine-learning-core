@@ -10,9 +10,10 @@ namespace TestLib
     {
         static void Main(string[] args)
         {
-            double[] matrix = new double[]{1, 2, 3, 1, 2, 3, 1, 2, 3};
+            double[] matrix = new double[]{1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3};
             double[,] toTwoDimMatrix = MyDll.Source.ToRectangular(matrix, 3);
-            double[,] transpose = MyDll.Source.Transpose(toTwoDimMatrix);
+            double[] test = new double[0];
+            int nb = MyDll.Source.ToLinear(ref test, toTwoDimMatrix);
             Console.WriteLine("");
         }
     }
