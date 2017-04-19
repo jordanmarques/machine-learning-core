@@ -12,7 +12,7 @@ namespace MyDll
     {
         public static double[] linear_create_model(int inputDimension)
         {
-            double[] model = new double[inputDimension];
+            double[] model = new double[inputDimension + 1];
             for (int i = 0; i < inputDimension; i++)
             {
                 Random random = new Random();
@@ -40,19 +40,27 @@ namespace MyDll
             return 0;
         }
 
-        public static int linear_fit_classification_hebb(ref double[] model, double[,] inputs, int iterationNumber, double step)
-        {
-            return 0;
-        }
-
         public static int linear_fit_classification_rosenblatt(ref double[] model, double[] inputs, double[] outputs, int iterationNumber, double step)
         {
 
 			double[,] Y = ToRectangular(outputs, 1);
-			double linearClassifyRes = linear_classify(ref model, inputs);
 			double[,] X = ToRectangular(inputs, 1);
 
+			for (int i = 0; i < iterationNumber; i++)
+			{
+				double linearClassifyRes = linear_classify(ref model, inputs);
 
+				double[,] sub = new double[1, 1];
+				sub[0, 0] = linearClassifyRes;
+
+				double[,] subRes = SubstractMatrix(Y, sub);
+				double[,] multiplyRes = MultiplyMatrix(X, subRes);
+				double[,] rectModel = ToRectangular(model, 1);
+
+				rectModel = AdditionMatrix(rectModel, MultiplyMatrixScalar(step, multiplyRes));
+				ToLinear(ref model, rectModel);
+
+			}
 
             return 0;
         }
