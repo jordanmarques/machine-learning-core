@@ -4,17 +4,29 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MyDll;
+using _2017_5A_AL2_MyFirstNativeDllForUnity;
+
 namespace TestLib
 {
     class Program
     {
         static void Main(string[] args)
         {
-            double[] matrix = new double[]{1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3};
-            double[,] toTwoDimMatrix = MyDll.Source.ToRectangular(matrix, 3);
-            double[] test = new double[0];
-            int nb = MyDll.Source.ToLinear(ref test, toTwoDimMatrix);
-            Console.WriteLine("");
+            double[][] inputs = new double[4][];
+            double[] outputs = {1, 1, -1, -1};
+            inputs[0] = new double[] {-1, 1};
+            inputs[1] = new double[] { 1, -1 };
+            inputs[2] = new double[] { 1, 1 };
+            inputs[3] = new double[] { -1, -1 };
+
+            SourceMulti.MLP network = SourceMulti.mlp_create_model(3, new int[] {2, 3, 1});
+            SourceMulti.mlp_fit_classification_backdrop(network, inputs, outputs, 1000, 0.1);
+
+            Console.WriteLine(SourceMulti.mlp_classify(network, new double[] { -1, 1 })[0]);
+            Console.WriteLine(SourceMulti.mlp_classify(network, new double[] { 1, -1 })[0]);
+            Console.WriteLine(SourceMulti.mlp_classify(network, new double[] { 1, 1 })[0]);
+            Console.WriteLine(SourceMulti.mlp_classify(network, new double[] { -1, -1 })[0]);
+            Console.ReadLine();
         }
     }
 }

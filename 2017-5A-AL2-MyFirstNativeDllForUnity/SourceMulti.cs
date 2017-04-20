@@ -20,23 +20,22 @@ namespace _2017_5A_AL2_MyFirstNativeDllForUnity
 
             public MLP(int numLayers, int[] npl)
             {
-                this.numLayers = numLayers;
+                this.numLayers = numLayers-1;
                 this.npl = npl;
-                weights = new double[numLayers][][];
+                weights = new double[this.numLayers + 1][][];
                 Random random = new Random();
-                for (int l = 0; l < numLayers; l++)
+                for (int l = 1; l <= this.numLayers; l++)
                 {
-                    weights[l] = new double[npl[l - 1]][];
-                    for (int i = 0; i < npl[l - 1]; i++)
+                    weights[l] = new double[npl[l - 1] + 1][];
+                    for (int i = 0; i <= npl[l - 1]; i++)
                     {
-                        weights[l][i] = new double[npl[l]];
-                        for (int j = 0; j < npl[l]; j++)
+                        weights[l][i] = new double[npl[l]+1];
+                        for (int j = 1; j <= npl[l]; j++)
                         {
                             weights[l][i][j] = random.NextDouble() * 2 - 1;
                         }
                     }
                 }
-                this.numLayers--;
             }
 
             public int FitRegressionBackDrop(double[][] inputs, double[] outputs, int iterationNumber, double step)
@@ -62,15 +61,15 @@ namespace _2017_5A_AL2_MyFirstNativeDllForUnity
             private double[] predictClassify(bool isClassify, double[] input)
             {
                 int size = input.Length;
-                ComputedOutputs = new double[size][];
+                ComputedOutputs = new double[npl[0] + 1][];
                 ComputedOutputs[0] = new double[size + 1];
                 ComputedOutputs[0][0] = 1;
-                for (int j = 0; j < size; j++)
+                for (int j = 1; j <= npl[0]; j++)
                 {
-                    ComputedOutputs[0][j] = input[j];
+                    ComputedOutputs[0][j] = input[j-1];
                 }
 
-                for (int l = 0; l <= numLayers; l++)
+                for (int l = 1; l <= numLayers; l++)
                 {
                     ComputedOutputs[l] = new double[npl[l] + 1];
                     ComputedOutputs[l][0] = 1;
@@ -87,10 +86,10 @@ namespace _2017_5A_AL2_MyFirstNativeDllForUnity
 
                 }
 
-                double[] result = new double[npl[numLayers]+1];
+                double[] result = new double[npl[numLayers]];
                 for (int i = 1; i <= npl[numLayers]; i++)
                 {
-                    result[i] = ComputedOutputs[numLayers][i];
+                    result[i-1] = ComputedOutputs[numLayers][i];
                 }
                 return result;
             }
@@ -106,7 +105,7 @@ namespace _2017_5A_AL2_MyFirstNativeDllForUnity
                     y[0] = 1;
                     for (int j = 1; j <= npl[numLayers]; j++)
                     {
-                        y[j] = outputs[(k - 1) * npl[numLayers] + j - 1];
+                        y[j] = outputs[k];
                     }
 
                     Deltas = new double[numLayers + 1][];
