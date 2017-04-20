@@ -13,7 +13,7 @@ namespace MyDll
         public static double[] linear_create_model(int inputDimension)
         {
             double[] model = new double[inputDimension + 1];
-            for (int i = 0; i < inputDimension; i++)
+            for (int i = 0; i <= inputDimension; i++)
             {
                 Random random = new Random();
                 model[i] = random.NextDouble() * 2 - 1;
