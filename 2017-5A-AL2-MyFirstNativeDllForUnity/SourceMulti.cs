@@ -81,7 +81,7 @@ namespace _2017_5A_AL2_MyFirstNativeDllForUnity
                             sum += weights[l][i][j] * ComputedOutputs[l - 1][i];
                         }
 
-                        ComputedOutputs[l][j] = isClassify ? Math.Tanh(sum) : sum;
+                        ComputedOutputs[l][j] = (!isClassify && numLayers == l ) ? sum : Math.Tanh(sum);
                     }
 
                 }
