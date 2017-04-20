@@ -13,9 +13,9 @@ namespace MyDll
         public static double[] linear_create_model(int inputDimension)
         {
             double[] model = new double[inputDimension + 1];
+            Random random = new Random();
             for (int i = 0; i <= inputDimension; i++)
             {
-                Random random = new Random();
                 model[i] = random.NextDouble() * 2 - 1;
             }
 
@@ -50,28 +50,49 @@ namespace MyDll
             return 0;
         }
 
-        public static int linear_fit_classification_rosenblatt(ref double[] model, double[] inputs, double[] outputs, int iterationNumber, double step)
+        public static int linear_fit_classification_rosenblatt(ref double[] model, double[,] inputs, double[] outputs, int iterationNumber, double step)
         {
-            double[] inputs2 = new double[inputs.Length+1];
-            inputs2[0] = 1;
-            for (int i = 0; i < inputs.Length; i++)
+            double[,] X = new double[inputs.GetLength(0), inputs.GetLength(1) + 1];
+            for (int j = 0; j < inputs.GetLength(0); j++)
             {
-                inputs2[i + 1] = inputs[i];
+                X[j, 0] = 1;
+                for (int k = 0; k < inputs.GetLength(1); k++)
+                {
+                    X[j, k + 1] = inputs[j, k];
+                }
             }
 
-            double[,] Y = ToRectangular(outputs, 1);
-			double[,] X = ToRectangular(inputs2, 1);
+            System.Random random = new System.Random();
+            
+            int len1 = X.GetLength(1);
+
+            double[,] rndInput = new double[len1, 1];
+            double[] flatRndInput = new double[len1 - 1];
+            double[,] rndOutput = new double[1, 1];
 
             for (int i = 0; i < iterationNumber; i++)
-			{
-				double linearClassifyRes = linear_classify(ref model, inputs);
+            {
+                int num = random.Next(0, outputs.Length);
+
+                for (int j = 0; j < len1; j++)
+                {
+                    rndInput[j, 0] = X[num, j];
+                    if (j > 0)
+                    {
+                        flatRndInput[j-1] = X[num, j];
+                    }
+                }
+
+                rndOutput[0, 0] = outputs[num];
+
+                double linearClassifyRes = linear_classify(ref model, flatRndInput);
 
 				double[,] sub = new double[1, 1];
 				sub[0, 0] = linearClassifyRes;
 
-				double[,] subRes = SubstractMatrix(Y, sub);
-				double[,] multiplyRes = MultiplyMatrix(X, subRes);
-				double[,] rectModel = ToRectangular(model, 1);
+				double[,] subRes = SubstractMatrix(rndOutput, sub);
+				double[,] multiplyRes = MultiplyMatrix(rndInput, subRes);
+                double[,] rectModel = ToRectangular(model, 1);
                 
                 rectModel = AdditionMatrix(rectModel, MultiplyMatrixScalar(step, multiplyRes));
 				ToLinear(ref model, rectModel);
