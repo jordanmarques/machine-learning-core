@@ -101,7 +101,14 @@ namespace _2017_5A_AL2_MyFirstNativeDllForUnity
                 for (int iter = 0; iter < iterationNumber; iter++)
                 {
                     int k = random.Next(0, inputs.Length);
-                    Classify(inputs[k]);
+                    if (isClassify)
+                    {
+                        Classify(inputs[k]);
+                    }
+                    else
+                    {
+                        Predict(inputs[k]);
+                    }
                     y[0] = 1;
                     for (int j = 1; j <= npl[numLayers]; j++)
                     {
