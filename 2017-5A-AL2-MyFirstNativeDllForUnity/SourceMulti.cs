@@ -61,8 +61,8 @@ namespace _2017_5A_AL2_MyFirstNativeDllForUnity
             private double[] predictClassify(bool isClassify, double[] input)
             {
                 int size = input.Length;
-                ComputedOutputs = new double[npl[0] + 1][];
-                ComputedOutputs[0] = new double[size + 1];
+                ComputedOutputs = new double[numLayers + 1][];
+                ComputedOutputs[0] = new double[npl[0] + 1];
                 ComputedOutputs[0][0] = 1;
                 for (int j = 1; j <= npl[0]; j++)
                 {
@@ -116,9 +116,9 @@ namespace _2017_5A_AL2_MyFirstNativeDllForUnity
                     }
 
                     Deltas = new double[numLayers + 1][];
+                    Deltas[numLayers] = new double[npl[numLayers] + 1];
                     for (int j = 1; j <= npl[numLayers]; j++)
                     {
-                        Deltas[numLayers] = new double[npl[numLayers] + 1];
                         if (isClassify)
                         {
                             Deltas[numLayers][j] = (1 - Math.Pow(ComputedOutputs[numLayers][j], 2)) * (ComputedOutputs[numLayers][j] - y[j]);
