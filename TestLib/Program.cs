@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MyDll;
-using _2017_5A_AL2_MyFirstNativeDllForUnity;
 
 namespace TestLib
 {

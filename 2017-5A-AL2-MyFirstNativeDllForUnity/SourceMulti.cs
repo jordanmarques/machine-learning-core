@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using static alglib;
 
-namespace _2017_5A_AL2_MyFirstNativeDllForUnity
+namespace MyDll
 {
     public static class SourceMulti
     {
